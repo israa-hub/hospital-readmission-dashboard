@@ -78,7 +78,6 @@ Each cluster represents a group of patients with similar:
   - Decision Tree
   - Random Forest
   - XGBoost
-  - TabNet
 
 ###  Stage 2: Timing Prediction
 - Applied only to readmitted patients
@@ -87,7 +86,7 @@ Each cluster represents a group of patients with similar:
   - Decision Tree
   - Random Forest
   - XGBoost
-  - TabNet
+
 
 ###  Key Techniques
 - SMOTE & SMOTEENN for class imbalance
