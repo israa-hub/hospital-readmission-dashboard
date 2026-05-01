@@ -1,0 +1,546 @@
+---
+title: "EDA"
+author: "Israa Atike"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+
+library(readr)
+
+data <- read_csv("C:/Users/Israa Atike/Documents/Project/thesis-project-israa-atike/data/processed_data.csv")
+
+head(data)
+```
+```{r}
+str(data)
+```
+```{r}
+# Load libraries
+library(dplyr)
+library(knitr)
+
+categorical_summary <- function(df, col_name) {
+  summary_table <- df %>%
+    group_by(.data[[col_name]]) %>%
+    reframe(
+      Count = n(),
+      Percentage = round(100 * n() / nrow(df), 2)
+    ) %>%
+    ungroup() %>%                  # make sure it's ungrouped
+    arrange(desc(Count))
+  
+  print(
+    knitr::kable(
+      summary_table,
+      caption = paste("Table: Distribution of", col_name),
+      col.names = c(col_name, "Count", "Percentage (%)"),
+      align = "lcc"
+    )
+  )
+}
+
+# List of categorical variables 
+
+categorical_vars <- c(
+  "race", "gender", "age", "readmitted", 
+  "change", "diabetesMed", 
+  "diag_1", "diag_2", "diag_3",
+  "max_glu_serum", "A1Cresult",
+  "metformin", "repaglinide", "nateglinide", "chlorpropamide",
+  "glimepiride", "acetohexamide", "glipizide", "glyburide", "tolbutamide",
+  "pioglitazone", "rosiglitazone", "acarbose", "miglitol", "troglitazone",
+  "tolazamide", "insulin",
+  "glyburide-metformin", "glipizide-metformin",
+  "metformin-pioglitazone"
+)
+
+# Generate tables for all categorical variables
+for (var in categorical_vars) {
+  categorical_summary(data, var)
+}
+
+
+```
+```{r}
+# Load libraries
+library(tidyverse)
+
+# List of categorical columns
+categorical_cols <- c(
+  "gender", "race", "age",
+  "admission_type_id", "discharge_disposition_id", "admission_source_id",
+  "diag_1", "diag_2", "diag_3",
+  "metformin", "repaglinide", "nateglinide", "chlorpropamide",
+  "glimepiride", "acetohexamide", "glipizide", "glyburide", "tolbutamide",
+  "pioglitazone", "rosiglitazone", "acarbose", "miglitol", "troglitazone",
+  "tolazamide", "insulin",
+  "glyburide-metformin", "glipizide-metformin",
+  "metformin-pioglitazone",
+  "change", "diabetesMed", "readmitted"
+)
+
+#  barplots for all categorical variables
+for (col in categorical_cols) {
+  p <- ggplot(data, aes(x = .data[[col]])) +
+    geom_bar(
+      fill = "#4C72B0",       
+      color = "grey30",      
+      width = 0.65
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(
+      axis.text.x = element_text(
+        angle = 45, 
+        hjust = 1, 
+        color = "grey20"
+      ),
+      axis.text.y = element_text(color = "grey20"),
+      axis.title = element_text(color = "grey20", face = "bold"),
+      plot.title = element_text(
+        face = "bold", 
+        hjust = 0.5,
+        color = "grey10"
+      ),
+      panel.grid.major.x = element_blank(), 
+      panel.grid.minor = element_blank()
+    ) +
+    labs(
+      title = paste("Distribution of", col),
+      x = col,
+      y = "Count of Patients"
+    )
+  
+  print(p)
+}
+
+```
+
+```{r}
+library(tidyverse)
+
+# List of numeric columns
+numeric_cols <- c(
+  "time_in_hospital",
+  "num_lab_procedures",
+  "num_procedures",
+  "num_medications",
+  "number_outpatient",
+  "number_emergency",
+  "number_inpatient",
+  "number_diagnoses"
+)
+
+for (col in numeric_cols) {
+
+  # Dynamic bin width
+  range_val <- max(data[[col]], na.rm = TRUE) - min(data[[col]], na.rm = TRUE)
+  bin_width <- ceiling(range_val / 30)
+
+  p <- ggplot(data, aes(x = .data[[col]])) +
+    geom_histogram(
+      binwidth = bin_width,
+      fill = "#4C72B0",  
+      color = "grey30", 
+      alpha = 0.9
+    ) +
+    labs(
+      title = paste("Distribution of", col),
+      x = col,
+      y = "Frequency"
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(
+      axis.text.x = element_text(color = "grey20"),
+      axis.text.y = element_text(color = "grey20"),
+      axis.title = element_text(color = "grey20", face = "bold"),
+      plot.title = element_text(
+        face = "bold",
+        hjust = 0.5,
+        color = "grey10"
+      ),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+
+  print(p)
+}
+
+```
+
+
+```{r}
+library(tidyverse)
+
+numeric_cols <- c(
+  "time_in_hospital",
+  "num_lab_procedures",
+  "num_procedures",
+  "num_medications",
+  "number_outpatient",
+  "number_emergency",
+  "number_inpatient",
+  "number_diagnoses"
+)
+
+for (col in numeric_cols) {
+  p <- ggplot(data, aes(x = readmitted, y = .data[[col]], fill = readmitted)) +
+    geom_boxplot(
+      color = "grey30",
+      width = 0.6,
+      outlier.color = "grey50"
+    ) +
+    scale_fill_manual(
+      values = c(
+        "NO"  = "#4C72B0",  
+        ">30" = "#55A868",  
+        "<30" = "#DD8452"   #
+      )
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(
+      axis.text.x = element_text(color = "grey20"),
+      axis.text.y = element_text(color = "grey20"),
+      axis.title = element_text(color = "grey20", face = "bold"),
+      plot.title = element_text(
+        face = "bold",
+        hjust = 0.5,
+        color = "grey10"
+      ),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor = element_blank(),
+      legend.position = "none"
+    ) +
+    labs(
+      title = paste("Boxplot of", col, "by Readmission Status"),
+      x = "Readmission Status",
+      y = col
+    )
+
+  print(p)
+}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# Select numerical variables only (
+num_df <- data[, c(
+  "time_in_hospital",
+  "num_lab_procedures",
+  "num_procedures",
+  "num_medications",
+  "number_outpatient",
+  "number_emergency",
+  "number_inpatient",
+  "number_diagnoses"
+)]
+
+# Scatterplot matrix
+pairs(
+  num_df,
+  main = "Scatterplot Matrix of Numerical Features",
+  pch = 19,        
+  col = "#4C72B0AA",  
+  cex = 0.6        
+)
+
+
+```
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(reshape2) 
+
+numeric_cols <- c(
+  "time_in_hospital",
+  "num_lab_procedures",
+  "num_procedures",
+  "num_medications",
+  "number_outpatient",
+  "number_emergency",
+  "number_inpatient",
+  "number_diagnoses"
+)
+
+cor_matrix <- cor(data[, numeric_cols], use = "complete.obs")
+
+melted_cor <- melt(cor_matrix)
+
+# Correlation heatmap
+ggplot(melted_cor, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(color = "grey90", linewidth = 0.3) +
+  scale_fill_gradient2(
+    low = "#4C72B0",    
+    mid = "white",
+    high = "#DD8452",   
+    midpoint = 0,
+    limits = c(-1, 1)
+  ) +
+  geom_text(
+    aes(label = sprintf("%.2f", value)),
+    size = 3,
+    color = "grey20"
+  ) +
+  theme_minimal(base_size = 12) +
+  labs(
+    title = "Correlation Heatmap of Numerical Features",
+    x = "",
+    y = "",
+    fill = "Correlation"
+  ) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      color = "grey20",
+      face = "bold"
+    ),
+    axis.text.y = element_text(
+      color = "grey20",
+      face = "bold"
+    ),
+    plot.title = element_text(
+      hjust = 0.5,
+      face = "bold",
+      color = "grey10"
+    ),
+    panel.grid = element_blank()
+  )
+
+```
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+# All categorical variables
+categorical_cols <- c(
+  "gender", "race", "age",
+  "admission_type_id", "discharge_disposition_id", "admission_source_id",
+  "diag_1", "diag_2", "diag_3",
+  "metformin", "repaglinide", "nateglinide", "chlorpropamide",
+  "glimepiride", "acetohexamide", "glipizide", "glyburide", "tolbutamide",
+  "pioglitazone", "rosiglitazone", "acarbose", "miglitol", "troglitazone",
+  "tolazamide", "insulin",
+  "glyburide-metformin", "glipizide-metformin", 
+  "metformin-pioglitazone",
+  "change", "diabetesMed"
+)
+
+# Remove near-zero variance variables
+nzv_vars <- c(
+  "nateglinide", "chlorpropamide", "acetohexamide", "tolbutamide",
+  "acarbose", "miglitol", "troglitazone", "tolazamide",
+  "glyburide-metformin", "glipizide-metformin",
+   "metformin-pioglitazone"
+)
+
+categorical_cols <- setdiff(categorical_cols, nzv_vars)
+
+# Function to create pivoted table for a categorical variable
+categorical_table <- function(df, cat_var) {
+  df %>%
+    group_by(.data[[cat_var]], readmitted) %>%
+    summarise(Count = n(), .groups = "drop") %>%
+    pivot_wider(
+      names_from = readmitted,
+      values_from = Count,
+      values_fill = 0
+    ) %>%
+    arrange(.data[[cat_var]]) %>%
+    rename(!!cat_var := 1) %>%
+    kable(caption = paste("Distribution of", cat_var, "by Readmission"))
+}
+
+# Loop over all selected categorical variables
+for (var in categorical_cols) {
+  print(categorical_table(data, var))
+}
+
+
+
+
+
+```
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+library(scales)
+
+
+# All categorical columns
+categorical_cols <- c(
+  "gender", "race", "age",
+  "admission_type_id", "discharge_disposition_id", "admission_source_id",
+  "diag_1", "diag_2", "diag_3",
+  "metformin", "repaglinide",
+  "glimepiride", "glipizide", "glyburide", "pioglitazone", "rosiglitazone",
+  "insulin", "change", "diabetesMed"
+)
+
+# Near-zero variance vars to remove
+nzv_vars <- c(
+  "nateglinide", "chlorpropamide", "acetohexamide", "tolbutamide",
+  "acarbose", "miglitol", "troglitazone", "tolazamide",
+  "glyburide-metformin", "glipizide-metformin", "metformin-pioglitazone"
+)
+
+categorical_cols <- setdiff(categorical_cols, nzv_vars)
+data$readmitted <- factor(
+  data$readmitted,
+  levels = c("No", ">30", "<30")
+)
+
+# Barplots for remaining categorical variables
+for (col in categorical_cols) {
+  p <- ggplot(data, aes(x = .data[[col]], fill = readmitted)) +
+    geom_bar(
+      position = "fill",
+      color = "grey30",
+      width = 0.75
+    ) +
+    scale_y_continuous(labels = percent_format()) +
+    scale_fill_manual(
+      values = c(
+        "No"  = "#4C72B0", 
+        ">30" = "#55A868",  
+        "<30" = "#DD8452"   
+      )
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(
+      axis.text.x = element_text(
+        angle = 45,
+        hjust = 1,
+        color = "grey20"
+      ),
+      axis.text.y = element_text(color = "grey20"),
+      axis.title = element_text(color = "grey20", face = "bold"),
+      legend.title = element_text(face = "bold"),
+      plot.title = element_text(
+        face = "bold",
+        hjust = 0.5,
+        color = "grey10"
+      ),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
+    labs(
+      title = paste("Readmission Distribution by", col),
+      x = col,
+      y = "Percentage",
+      fill = "Readmitted"
+    )
+
+  print(p)
+}
+
+```
+
+
+
+
+```{r}
+
+library(dplyr)
+
+
+
+numeric_cols <- c(
+
+  "time_in_hospital",
+
+  "num_lab_procedures",
+
+  "num_procedures",
+
+  "num_medications",
+
+  "number_outpatient",
+
+  "number_emergency",
+
+  "number_inpatient",
+
+  "number_diagnoses"
+
+)
+
+
+
+numeric_summary_by_readmitted <- data %>%
+
+  group_by(readmitted) %>%
+
+  summarise(across(all_of(numeric_cols), 
+
+                   list(mean = ~mean(.x, na.rm = TRUE),
+
+                        median = ~median(.x, na.rm = TRUE),
+
+                        min = ~min(.x, na.rm = TRUE),
+
+                        max = ~max(.x, na.rm = TRUE)),
+
+                   .names = "{.col}_{.fn}"),
+
+            .groups = "drop")
+
+
+
+print(numeric_summary_by_readmitted)
+
+
+
+numeric_summary_overall <- data %>%
+
+  summarise(across(all_of(numeric_cols),
+
+                   list(mean = ~round(mean(.x, na.rm = TRUE), 2),
+
+                        median = ~median(.x, na.rm = TRUE),
+
+                        min = ~min(.x, na.rm = TRUE),
+
+                        max = ~max(.x, na.rm = TRUE)),
+
+                   .names = "{.col}_{.fn}"))
+
+
+
+print(numeric_summary_overall)
+
+
+
+
+
+```
+
+
+
+

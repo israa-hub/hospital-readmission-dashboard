@@ -1,0 +1,99 @@
+project:
+  name: "Hospital Readmission Prediction System"
+  author: "Israa Atike"
+  type: "Final Year Bachelor's Project"
+  version: "1.0"
+  date: "2026"
+
+paths:
+  root: "."
+  dashboard: "Dashboard/dashboard.py"
+  data: "data/"
+  models: "models/"
+  outputs: "outputs/"
+  scripts: "scripts/"
+  notebooks: "notebooks/"
+  docs: "docs/"
+
+data:
+  raw:
+    diabetic: "data/diabetic_data.csv"
+    ids_mapping: "data/IDS_mapping.csv"
+
+  processed:
+    cleaned: "data/processed_data.csv"
+    model_input: "data/hurdle_data.pkl"
+
+models:
+  trained_model: "models/trained_model.pkl"
+
+training:
+  script: "scripts/Train_model.py"
+
+notebooks:
+  eda: "notebooks/eda.Rmd"
+  data_processing: "scripts/data_processing.ipynb"
+  feature_engineering, data reduction and clustering: "scripts/Feature_engineering_data_reduction_clustering.ipynb"
+  evaluation: "scripts/Model_evaluation.ipynb"
+
+outputs:
+  plots:
+    roc: "outputs/roc_curves.png"
+    pr: "outputs/pr_curves.png"
+    auc: "outputs/auc_comparison.png"
+    confusion: "outputs/confusion_matrices.png"
+    feature_importance: "outputs/feature_importance_comparison.png"
+    shap_stage1: "outputs/shap_summary_stage1.png"
+    shap_stage2: "outputs/shap_summary_stage2.png"
+    threshold: "outputs/threshold_comparison.png"
+
+  tables:
+    stage1_default: "outputs/stage1_default_metrics.csv"
+    stage1_tuned: "outputs/stage1_tuned_metrics.csv"
+    stage2_default: "outputs/stage2_default_metrics.csv"
+    stage2_tuned: "outputs/stage2_tuned_metrics.csv"
+    shap_stage1: "outputs/shap_importance_stage1.csv"
+    shap_stage2: "outputs/shap_importance_stage2.csv"
+    feature_importance: "outputs/feature_importance_comparison.csv"
+    error_summary: "outputs/error_summary.csv"
+
+pipeline:
+  steps:
+    - data_cleaning
+    - feature_engineering
+    - data_reduction
+    - clustering
+    - stage1_modeling
+    - stage2_modeling
+    - evaluation
+    - dashboard
+
+data_reduction:
+  methods:
+    - PCA
+    - MCA
+
+clustering:
+  method: "K-Medoids"
+  n_clusters: 3
+  cluster_labels:
+    0: "Stable"
+    1: "Fragile Elderly"
+    2: "Unstable Metabolic"
+
+prediction:
+  type: "Two-Stage Hurdle Model"
+
+  stage1:
+    task: "Readmission Prediction"
+    output: "Readmitted vs Not Readmitted"
+
+  stage2:
+    task: "Timing Prediction"
+    output: "Early (<30 days) vs Late (>30 days)"
+    condition: "Only applied if Stage 1 predicts readmission"
+
+dashboard:
+  framework: "Streamlit"
+  run_command: "streamlit run Dashboard/dashboard.py"
+

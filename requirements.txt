@@ -1,0 +1,17 @@
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+scikit-learn-extra
+imbalanced-learn
+xgboost
+pytorch-tabnet
+torch
+shap
+prince
+gower
+plotly
+streamlit
+pyyaml
+openpyxl

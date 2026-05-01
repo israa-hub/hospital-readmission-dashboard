@@ -1,0 +1,5 @@
+Model,Threshold,AUC-ROC,PR-AUC,Accuracy,F1_weighted,F1_positive,Precision_positive,Recall_positive
+XGBoost,0.39,0.6597,0.5741,0.532,0.501,0.6036,0.4641,0.8629
+Random Forest,0.36,0.6492,0.5628,0.5022,0.4484,0.5997,0.4489,0.9029
+Logistic Regression,0.28,0.5984,0.4914,0.4543,0.3545,0.5886,0.4273,0.9453
+Decision Tree,0.25,0.613,0.5037,0.4474,0.3386,0.5875,0.4247,0.9527
