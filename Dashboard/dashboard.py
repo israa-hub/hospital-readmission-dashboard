@@ -24,6 +24,9 @@ st.set_page_config(
 # CUSTOM CSS
 st.markdown("""
 <style>
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
     .stApp {
         background: linear-gradient(135deg, #dff5f6 0%, #f6fff4 45%, #f8f1ff 100%);
     }
