@@ -164,8 +164,6 @@ Each cluster represents a group of patients with similar:
 - Stage 2 SHAP: Why early or late timing was predicted
 - Top positive/negative contributing features
 
----
-```
 
 
 
@@ -173,4 +171,5 @@ Each cluster represents a group of patients with similar:
 
 This tool is designed for **research and educational purposes only**. It should not be used as the sole basis for clinical decision-making without validation by healthcare professionals. Always consult with qualified medical personnel for patient care decisions.
 
-
+---
+```
